@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>All Classrooms</title>
+    <link rel="stylesheet" href="allclass.css" />
+  </head>
+  <body>
+    <h1>All Classrooms</h1>
+    <div id="classrooms-container">
+      <div id="classrooms-list" class="group-list"></div>
+    </div>
+
+    <!-- Password Modal -->
+    <div id="password-modal" class="modal">
+      <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>Enter Classroom Password</h2>
+        <input
+          type="password"
+          id="classroom-password"
+          placeholder="Enter classroom password"
+        />
+        <button id="submit-password">Submit</button>
+      </div>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div id="confirm-delete-modal" class="modal">
+      <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>Confirm Deletion</h2>
+        <p>Are you sure you want to delete this classroom?</p>
+        <button id="confirm-delete">Delete</button>
+        <button id="cancel-delete">Cancel</button>
+      </div>
+    </div>
+
+    <script>
+      let selectedClassroom = null;
+      let classroomToDelete = null;
+
+      async function loadClassrooms() {
+        try {
+          const response = await fetch("/api/classrooms");
+          const classrooms = await response.json();
+          const classroomsList = document.getElementById("classrooms-list");
+          classroomsList.innerHTML = "";
+
+          classrooms.forEach((classroom) => {
+            const classroomDiv = document.createElement("div");
+            classroomDiv.classList.add("group-box");
+            classroomDiv.innerHTML = `
+              <div class="group">
+                <h3>${classroom.course}</h3>
+                <p>Staff Name: ${classroom.staffName}</p>
+                <button class="delete-button" data-classroom-id="${classroom._id}">Delete</button>
+              </div>
+            `;
+            classroomsList.appendChild(classroomDiv);
+
+            // Attach event listener for classroom div
+            classroomDiv.addEventListener("click", (event) => {
+              if (event.target.classList.contains("delete-button")) {
+                classroomToDelete = classroom;
+                document.getElementById("confirm-delete-modal").style.display =
+                  "block";
+              } else {
+                selectedClassroom = classroom;
+                document.getElementById("password-modal").style.display =
+                  "block";
+              }
+            });
+          });
+        } catch (error) {
+          console.error("Error loading classrooms:", error);
+          alert("Error loading classrooms");
+        }
+      }
+
+      window.addEventListener("load", () => {
+        loadClassrooms();
+
+        // Close the modals if the user clicks outside of them
+        window.onclick = (event) => {
+          const passwordModal = document.getElementById("password-modal");
+          const confirmDeleteModal = document.getElementById(
+            "confirm-delete-modal"
+          );
+          if (event.target === passwordModal) {
+            passwordModal.style.display = "none";
+          }
+          if (event.target === confirmDeleteModal) {
+            confirmDeleteModal.style.display = "none";
+          }
+        };
+
+        // Close the modals if the user clicks the close button
+        const closeBtns = document.querySelectorAll(".close");
+        closeBtns.forEach((btn) => {
+          btn.onclick = () => {
+            document.getElementById("password-modal").style.display = "none";
+            document.getElementById("confirm-delete-modal").style.display =
+              "none";
+          };
+        });
+
+        // Handle password submission
+        document.getElementById("submit-password").onclick = async () => {
+          const password = document.getElementById("classroom-password").value;
+          if (password.trim() === "") {
+            alert("Please enter the classroom password");
+            return;
+          }
+          try {
+            const response = await fetch("/api/classrooms/verifyPassword", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({ password }),
+            });
+            const data = await response.json();
+            if (data.success) {
+              window.location.href = data.redirectUrl;
+            } else {
+              alert(data.message);
+            }
+          } catch (error) {
+            console.error("Error verifying password:", error);
+            alert("Error verifying password");
+          }
+        };
+
+        // Handle classroom deletion
+        document.getElementById("confirm-delete").onclick = async () => {
+          try {
+            const response = await fetch(
+              `/api/classrooms/deleteClassroom/${classroomToDelete._id}`,
+              {
+                method: "DELETE",
+              }
+            );
+            const data = await response.json();
+            alert(data.message);
+            document.getElementById("confirm-delete-modal").style.display =
+              "none";
+            loadClassrooms();
+          } catch (error) {
+            console.error("Error deleting classroom:", error);
+            alert("Error deleting classroom");
+          }
+        };
+
+        document.getElementById("cancel-delete").onclick = () => {
+          document.getElementById("confirm-delete-modal").style.display =
+            "none";
+        };
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Create Group</title>
+    <link rel="stylesheet" href="style1.css" />
+  </head>
+  <body>
+    <h1>Create a New Group</h1>
+    <form id="create-group-form">
+      <div>
+        <label for="group-name">Group Name:</label>
+        <input type="text" id="group-name" name="groupName" required />
+      </div>
+      <div>
+        <label for="course">Course:</label>
+        <input type="text" id="course" name="course" required />
+      </div>
+      <div>
+        <label for="group-no">Group Number:</label>
+        <input type="text" id="group-no" name="groupNo" required />
+      </div>
+      <div>
+        <label for="staff-name">Staff Name:</label>
+        <input type="text" id="staff-name" name="staffName" required />
+      </div>
+      <div>
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" required />
+      </div>
+      <button type="submit">Create Group</button>
+    </form>
+
+    <button id="view-groups-button">View All Groups</button>
+
+    <script>
+      document
+        .getElementById("create-group-form")
+        .addEventListener("submit", async (event) => {
+          event.preventDefault();
+          const groupName = document.getElementById("group-name").value;
+          const course = document.getElementById("course").value;
+          const groupNo = document.getElementById("group-no").value;
+          const staffName = document.getElementById("staff-name").value;
+          const password = document.getElementById("password").value;
+
+          try {
+            const response = await fetch("/api/groups/createGroup", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                groupName,
+                course,
+                groupNo,
+                staffName,
+                password,
+              }),
+            });
+
+            if (response.ok) {
+              alert("Group created successfully!");
+              document.getElementById("create-group-form").reset();
+            } else {
+              alert("Error creating group.");
+            }
+          } catch (error) {
+            console.error("Error creating group:", error);
+            alert("Error creating group.");
+          }
+        });
+
+      document
+        .getElementById("view-groups-button")
+        .addEventListener("click", () => {
+          window.location.href = "allgroups.html";
+        });
+    </script>
+  </body>
+</html>

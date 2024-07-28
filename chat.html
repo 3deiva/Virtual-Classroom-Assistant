@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Teacher Group Chat</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div id="chat-container">
+      <h1>Teacher Group Chat</h1>
+      <div id="messages-container" class="message-container"></div>
+      <form
+        id="message-form"
+        class="message-form"
+        enctype="multipart/form-data"
+      >
+        <input
+          type="text"
+          id="message-input"
+          name="text"
+          placeholder="Type your message..."
+        />
+        <input
+          type="file"
+          id="file-input"
+          name="file"
+          accept=".pdf, .jpg, .jpeg, .png"
+        />
+        <button type="submit">Send</button>
+      </form>
+    </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const groupId = urlParams.get("groupId");
+        const teacherName = urlParams.get("teacherName");
+        const teacherUserId = urlParams.get("teacherUserId");
+
+        async function loadMessages() {
+          try {
+            const response = await fetch(`/api/groups/messages/${groupId}`);
+            if (!response.ok) {
+              throw new Error("Failed to load messages");
+            }
+            const messages = await response.json();
+            const messagesContainer =
+              document.getElementById("messages-container");
+            messagesContainer.innerHTML = "";
+
+            messages.forEach((message) => {
+              const messageDiv = document.createElement("div");
+              messageDiv.classList.add("message-box");
+
+              // Determine alignment based on sender
+              const messageAlignment =
+                message.sender === `${teacherName} staff(${teacherUserId})`
+                  ? "right"
+                  : "left";
+
+              // Add a delete button for messages sent by the current teacher
+              const deleteButton =
+                message.sender === `${teacherName} staff(${teacherUserId})`
+                  ? `<button class="delete-button" data-message-id="${message._id}">Delete</button>`
+                  : "";
+
+              messageDiv.innerHTML = `
+                <div class="message ${messageAlignment}">
+                  <p class="sender-name">${message.sender}</p>
+                  ${
+                    message.fileUrl
+                      ? `<a href="${message.fileUrl}" target="_blank">View File</a>`
+                      : `<p>${message.content}</p>`
+                  }
+                  <p class="message-time">${formatMessageTime(
+                    message.createdAt
+                  )}</p>
+                  ${deleteButton}
+                </div>
+              `;
+              messagesContainer.appendChild(messageDiv);
+            });
+
+            // Scroll to bottom of messages container
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+            // Attach event listener for delete buttons
+            const deleteButtons = document.querySelectorAll(".delete-button");
+            deleteButtons.forEach((button) => {
+              button.addEventListener("click", async (event) => {
+                const messageId = event.target.dataset.messageId;
+                try {
+                  const response = await fetch(
+                    `/api/groups/deleteMessage/${groupId}/${messageId}`,
+                    {
+                      method: "DELETE",
+                    }
+                  );
+
+                  if (response.ok) {
+                    loadMessages(); // Reload messages after deletion
+                  } else {
+                    throw new Error("Failed to delete message");
+                  }
+                } catch (error) {
+                  console.error("Error deleting message:", error);
+                  alert("Error deleting message");
+                }
+              });
+            });
+          } catch (error) {
+            console.error("Error loading messages:", error);
+            alert("Error loading messages");
+          }
+        }
+
+        loadMessages();
+
+        const messageForm = document.getElementById("message-form");
+        messageForm.addEventListener("submit", async (event) => {
+          event.preventDefault();
+
+          const formData = new FormData(messageForm);
+          // Append "Staff" to the teacher's name
+          formData.append("sender", `${teacherName} staff(${teacherUserId})`);
+
+          try {
+            const response = await fetch(`/api/groups/sendMessage/${groupId}`, {
+              method: "POST",
+              body: formData,
+            });
+
+            if (!response.ok) {
+              throw new Error("Failed to send message");
+            }
+
+            document.getElementById("message-input").value = "";
+            document.getElementById("file-input").value = "";
+            loadMessages();
+          } catch (error) {
+            console.error("Error sending message:", error);
+            alert("Error sending message");
+          }
+        });
+
+        function formatMessageTime(timestamp) {
+          const date = new Date(timestamp);
+          return date.toLocaleString("en-US", {
+            hour: "numeric",
+            minute: "numeric",
+            second: "numeric",
+            hour12: true,
+          });
+        }
+      });
+    </script>
+  </body>
+</html>

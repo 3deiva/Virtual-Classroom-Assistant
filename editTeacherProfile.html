@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Edit Teacher Profile</title>
+    <link rel="stylesheet" href="edit.css" />
+  </head>
+  <body>
+    <div class="edit-profile-container">
+      <h1>Edit Teacher Profile</h1>
+      <form id="editProfileForm" enctype="multipart/form-data">
+        <div class="form-group">
+          <label for="name">Name:</label>
+          <input type="text" id="name" name="name" required />
+        </div>
+        <div class="form-group">
+          <label for="age">Age:</label>
+          <input type="number" id="age" name="age" required />
+        </div>
+        <div class="form-group">
+          <label for="phoneNo">Phone Number:</label>
+          <input type="text" id="phoneNo" name="phoneNo" readonly />
+        </div>
+        <div class="form-group">
+          <label for="email">Email:</label>
+          <input type="email" id="email" name="email" required />
+        </div>
+        <div class="form-group">
+          <label for="course">Course:</label>
+          <input type="text" id="course" name="course" required />
+        </div>
+        <div class="form-group">
+          <label for="faceData">Upload New Face Data:</label>
+          <input type="file" id="faceData" name="faceData" />
+        </div>
+        <button type="submit">Save Changes</button>
+      </form>
+    </div>
+
+    <script>
+      const urlParams = new URLSearchParams(window.location.search);
+      const phoneNo = urlParams.get("phoneNo");
+
+      // Fetch teacher profile details from backend and populate form
+      fetch(`/api/auth/teacher/${phoneNo}`)
+        .then((response) => response.json())
+        .then((data) => {
+          document.getElementById("name").value = data.name;
+          document.getElementById("age").value = data.age;
+          document.getElementById("phoneNo").value = data.phoneNo;
+          document.getElementById("email").value = data.email;
+          document.getElementById("course").value = data.course;
+        })
+        .catch((error) =>
+          console.error("Error fetching teacher profile:", error)
+        );
+
+      // Form submission handler
+      document
+        .getElementById("editProfileForm")
+        .addEventListener("submit", function (event) {
+          event.preventDefault();
+
+          const formData = new FormData();
+          formData.append("name", document.getElementById("name").value);
+          formData.append("age", document.getElementById("age").value);
+          formData.append("phoneNo", document.getElementById("phoneNo").value);
+          formData.append("email", document.getElementById("email").value);
+          formData.append("course", document.getElementById("course").value);
+          formData.append(
+            "faceData",
+            document.getElementById("faceData").files[0]
+          ); // Assuming single file upload
+
+          // Update teacher profile details via API
+          fetch(`/api/auth/updateTeacher/${phoneNo}`, {
+            method: "PUT",
+            body: formData,
+          })
+            .then((response) => {
+              if (response.ok) {
+                alert("Profile updated successfully");
+                window.location.href = `/profile.html?role=teacher&phoneNo=${phoneNo}`; // Redirect to profile page
+              } else {
+                throw new Error("Failed to update profile");
+              }
+            })
+            .catch((error) => {
+              console.error("Error updating profile:", error);
+              alert("Failed to update profile. Please try again.");
+            });
+        });
+    </script>
+  </body>
+</html>

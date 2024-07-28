@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Teacher Dashboard</title>
+    <link rel="stylesheet" href="t.css" />
+  </head>
+  <body>
+    <div class="main-container">
+      <!-- Sidebar -->
+      <aside class="sidebar">
+        <div class="sidebar-header">
+          <h2>Teacher Dashboard</h2>
+        </div>
+        <ul class="sidebar-nav">
+          <li><a href="#" id="profileLink">Profile</a></li>
+          <li><a href="/chatbot.html">Chatbot</a></li>
+          <li><a href="/classrooms.html">Attendance</a></li>
+          <li><a href="/groups.html">Groups</a></li>
+          <li><a href="/assignments.html">Assignments</a></li>
+        </ul>
+      </aside>
+
+      <!-- Main Content -->
+      <div class="content">
+        <header class="top-bar">
+          <div class="user-info">
+            <span id="welcomeMessage">Welcome, Teacher</span>
+          </div>
+        </header>
+
+        <main>
+          <h1>Dashboard Overview</h1>
+          <p>
+            Welcome to your dashboard, where you can manage various aspects of
+            your teaching responsibilities. Use the sidebar to navigate between
+            sections, and use the cards below to quickly access key features.
+          </p>
+
+          <!-- Cards Section -->
+          <div class="card-container">
+            <div class="card">
+              <h2>Manage Profile</h2>
+              <p>Update your profile information and preferences.</p>
+            </div>
+            <div class="card">
+              <h2>Chat with Students</h2>
+              <p>Access the chatbot to communicate with your students.</p>
+            </div>
+            <div class="card">
+              <h2>View Classrooms</h2>
+              <p>Check and manage attendance for your classrooms.</p>
+            </div>
+            <div class="card">
+              <h2>Manage Groups</h2>
+              <p>Organize and manage student groups effectively.</p>
+            </div>
+            <div class="card">
+              <h2>Assignments Overview</h2>
+              <p>Track and manage student assignments.</p>
+            </div>
+          </div>
+        </main>
+      </div>
+    </div>
+
+    <script>
+      const urlParams = new URLSearchParams(window.location.search);
+      const phoneNo = urlParams.get("phoneNo");
+
+      // Update profile link with phone number
+      document
+        .getElementById("profileLink")
+        .setAttribute("href", `/profile.html?phoneNo=${phoneNo}`);
+    </script>
+  </body>
+</html>

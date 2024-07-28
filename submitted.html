@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Submitted Assignments</title>
+    <link rel="stylesheet" href="submitted.css" />
+  </head>
+  <body>
+    <h1>Submitted Assignments</h1>
+    <div id="submissions-container">
+      <div id="submissions-list" class="submission-list"></div>
+    </div>
+
+    <!-- Modal for Verifying or Rejecting Submission -->
+    <div id="submission-modal" class="modal">
+      <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>Submission Details</h2>
+        <div id="submission-details"></div>
+        <button id="verify-button">Verify</button>
+        <button id="reject-button">Reject</button>
+      </div>
+    </div>
+
+    <script>
+      let submissionToManage = null;
+
+      async function loadSubmissions() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const assignmentId = urlParams.get("assignmentId");
+
+        if (!assignmentId) {
+          console.error("Assignment ID is missing in the URL");
+          return;
+        }
+
+        try {
+          const response = await fetch(`/api/submissions/${assignmentId}`);
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+
+          const submissions = await response.json();
+          const submissionsList = document.getElementById("submissions-list");
+          submissionsList.innerHTML = "";
+
+          submissions.forEach((submission) => {
+            const submissionDiv = document.createElement("div");
+            submissionDiv.classList.add("submission-box");
+            submissionDiv.innerHTML = `
+              <div class="submission">
+                <h3>${submission.assignmentName}</h3>
+                <p>Student Name: ${submission.studentName}</p>
+                <p>Roll Number: ${submission.rollNo}</p>
+                <p>Submitted Files: <a href="${submission.driveLink}" target="_blank">View Files</a></p>
+                <button class="view-button" data-submission-id="${submission._id}">View Submission</button>
+              </div>
+            `;
+            submissionsList.appendChild(submissionDiv);
+
+            const viewButton = submissionDiv.querySelector(".view-button");
+            viewButton.addEventListener("click", () => showModal(submission));
+          });
+        } catch (error) {
+          console.error("Error fetching submissions:", error);
+        }
+      }
+
+      function showModal(submission) {
+        const modal = document.getElementById("submission-modal");
+        const submissionDetails = document.getElementById("submission-details");
+        submissionDetails.innerHTML = `
+          <p>Assignment Name: ${submission.assignmentName}</p>
+          <p>Student Name: ${submission.studentName}</p>
+          <p>Roll Number: ${submission.rollNo}</p>
+          <p>Submitted Files: <a href="${submission.driveLink}" target="_blank">View Files</a></p>
+        `;
+
+        submissionToManage = submission;
+        modal.style.display = "block";
+      }
+
+      document
+        .getElementById("verify-button")
+        .addEventListener("click", async () => {
+          if (submissionToManage) {
+            try {
+              const response = await fetch("/api/verifySubmission", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ submissionId: submissionToManage._id }),
+              });
+
+              if (response.ok) {
+                alert("Submission verified successfully");
+                submissionToManage = null;
+                document.getElementById("submission-modal").style.display =
+                  "none";
+                loadSubmissions();
+              } else {
+                alert("Error verifying submission");
+              }
+            } catch (error) {
+              console.error("Error verifying submission:", error);
+            }
+          }
+        });
+
+      document
+        .getElementById("reject-button")
+        .addEventListener("click", async () => {
+          if (submissionToManage) {
+            try {
+              const response = await fetch("/api/rejectSubmission", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ submissionId: submissionToManage._id }),
+              });
+
+              if (response.ok) {
+                alert("Submission rejected successfully");
+                submissionToManage = null;
+                document.getElementById("submission-modal").style.display =
+                  "none";
+                loadSubmissions();
+              } else {
+                alert("Error rejecting submission");
+              }
+            } catch (error) {
+              console.error("Error rejecting submission:", error);
+            }
+          }
+        });
+
+      document.querySelector(".close").addEventListener("click", () => {
+        document.getElementById("submission-modal").style.display = "none";
+        submissionToManage = null;
+      });
+
+      window.addEventListener("click", (event) => {
+        const modal = document.getElementById("submission-modal");
+        if (event.target == modal) {
+          modal.style.display = "none";
+          submissionToManage = null;
+        }
+      });
+
+      loadSubmissions();
+    </script>
+  </body>
+</html>

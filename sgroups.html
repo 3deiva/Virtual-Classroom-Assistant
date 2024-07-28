@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>All Groups</title>
+    <link rel="stylesheet" href="style2.css" />
+  </head>
+  <body>
+    <h1>All Groups</h1>
+    <div id="groups-container">
+      <div id="groups-list" class="group-list"></div>
+    </div>
+
+    <!-- Password Modal -->
+    <div id="password-modal" class="modal">
+      <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>Enter Details for Group</h2>
+        <input type="text" id="student-name" placeholder="Enter your name" />
+        <input
+          type="text"
+          id="student-rollno"
+          placeholder="Enter your roll number"
+        />
+        <input
+          type="password"
+          id="group-password"
+          placeholder="Enter group password"
+        />
+        <button id="submit-details">Submit</button>
+      </div>
+    </div>
+
+    <script>
+      let selectedGroup = null;
+
+      async function loadGroups() {
+        try {
+          const response = await fetch("/api/groups/groups");
+          const groups = await response.json();
+          const groupsList = document.getElementById("groups-list");
+          groupsList.innerHTML = "";
+
+          groups.forEach((group) => {
+            const groupDiv = document.createElement("div");
+            groupDiv.classList.add("group-box");
+            groupDiv.innerHTML = `
+                    <div class="group">
+                        <h3>${group.groupName}</h3>
+                        <p>Course: ${group.course}</p>
+                        <p>Staff Name: ${group.staffName}</p>
+                    </div>
+                `;
+            groupsList.appendChild(groupDiv);
+
+            // Attach event listener for group div
+            groupDiv.addEventListener("click", () => {
+              selectedGroup = group;
+              document.getElementById("password-modal").style.display = "block";
+            });
+          });
+        } catch (error) {
+          console.error("Error loading groups:", error);
+          alert("Error loading groups");
+        }
+      }
+
+      window.addEventListener("load", () => {
+        loadGroups();
+
+        // Close the password modal if the user clicks outside of it
+        window.onclick = (event) => {
+          const modal = document.getElementById("password-modal");
+          if (event.target === modal) {
+            modal.style.display = "none";
+          }
+        };
+
+        // Close the password modal if the user clicks the close button
+        const closeBtn = document.querySelector(".close");
+        closeBtn.onclick = () => {
+          document.getElementById("password-modal").style.display = "none";
+        };
+
+        // Submit details and verify
+        const submitBtn = document.getElementById("submit-details");
+        submitBtn.onclick = async () => {
+          const name = document.getElementById("student-name").value;
+          const rollNo = document.getElementById("student-rollno").value;
+          const password = document.getElementById("group-password").value;
+
+          try {
+            // Verify student and group details
+            const verifyResponse = await fetch("/api/groups/verifyStudent", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                studentName: name,
+                rollNo: rollNo,
+                password: password,
+                groupName: selectedGroup.groupName, // Use selectedGroup groupName
+              }),
+            });
+
+            const verifyResult = await verifyResponse.json();
+
+            if (verifyResponse.ok) {
+              if (verifyResult.success) {
+                window.location.href = `/schat.html?groupId=${
+                  selectedGroup._id
+                }&studentName=${encodeURIComponent(
+                  name
+                )}&studentRollNo=${encodeURIComponent(rollNo)}`;
+              } else {
+                alert(verifyResult.message);
+              }
+            } else {
+              alert("Error verifying student details.");
+            }
+          } catch (error) {
+            console.error("Error verifying student:", error);
+            alert("Error verifying student details.");
+          }
+        };
+      });
+    </script>
+  </body>
+</html>

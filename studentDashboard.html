@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Student Dashboard</title>
+    <link rel="stylesheet" href="t.css" />
+  </head>
+  <body>
+    <div class="main-container">
+      <!-- Sidebar -->
+      <aside class="sidebar">
+        <div class="sidebar-header">
+          <h2>Student Dashboard</h2>
+        </div>
+        <ul class="sidebar-nav">
+          <li><a href="#" id="profileLink">Profile</a></li>
+          <li><a href="/chatbot.html">Chatbot</a></li>
+          <li><a href="/sallclassrooms.html">Attendance</a></li>
+          <li><a href="/sgroups.html">Groups</a></li>
+          <li><a href="/sallassignments.html">Assignments</a></li>
+          <li><a href="/assignmentsstatus.html">Assignment Status</a></li>
+        </ul>
+      </aside>
+
+      <!-- Main Content -->
+      <div class="content">
+        <header class="top-bar">
+          <div class="user-info">
+            <span id="welcomeMessage">Welcome, Student</span>
+          </div>
+        </header>
+
+        <main>
+          <section class="overview">
+            <h1>Welcome to the Student Dashboard</h1>
+            <p>
+              This dashboard provides a centralized view of your academic
+              journey. Here you can manage your profile, view your attendance,
+              participate in group discussions, check your assignments, and
+              monitor the status of your submissions.
+            </p>
+            <div class="card-container">
+              <div class="card">
+                <h2>Profile</h2>
+                <p>
+                  Update your personal information and view your academic
+                  details.
+                </p>
+              </div>
+              <div class="card">
+                <h2>Chatbot</h2>
+                <p>
+                  Interact with our AI-powered chatbot for assistance with your
+                  coursework and assignments.
+                </p>
+              </div>
+              <div class="card">
+                <h2>Attendance</h2>
+                <p>
+                  Check your attendance records and ensure you are up-to-date
+                  with your classes.
+                </p>
+              </div>
+              <div class="card">
+                <h2>Groups</h2>
+                <p>
+                  Join and interact with your study groups to collaborate on
+                  projects and assignments.
+                </p>
+              </div>
+              <div class="card">
+                <h2>Assignments</h2>
+                <p>
+                  View and submit your assignments. Keep track of deadlines and
+                  requirements.
+                </p>
+              </div>
+              <div class="card">
+                <h2>Assignment Status</h2>
+                <p>
+                  Check the status of your submitted assignments and ensure all
+                  are graded.
+                </p>
+              </div>
+            </div>
+          </section>
+        </main>
+      </div>
+    </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const phoneNo = urlParams.get("phoneNo");
+
+        if (phoneNo) {
+          const profileLink = document.getElementById("profileLink");
+          const assignmentStatusLink = document.getElementById(
+            "assignmentStatusLink"
+          );
+
+          if (profileLink) {
+            profileLink.setAttribute(
+              "href",
+              `/sprofile.html?phoneNo=${phoneNo}`
+            );
+          }
+
+          if (assignmentStatusLink) {
+            assignmentStatusLink.setAttribute(
+              "href",
+              `/assignment-status.html?phoneNo=${phoneNo}`
+            );
+          }
+        }
+      });
+    </script>
+  </body>
+</html>

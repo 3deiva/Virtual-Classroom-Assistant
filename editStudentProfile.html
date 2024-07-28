@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Edit Student Profile</title>
+    <link rel="stylesheet" href="edit.css" />
+  </head>
+  <body>
+    <div class="edit-profile-container">
+      <h1>Edit Student Profile</h1>
+      <form id="editProfileForm">
+        <div class="form-group">
+          <label for="name">Name:</label>
+          <input type="text" id="name" name="name" required />
+        </div>
+        <div class="form-group">
+          <label for="age">Age:</label>
+          <input type="number" id="age" name="age" required />
+        </div>
+        <div class="form-group">
+          <label for="phoneNo">Phone Number:</label>
+          <input type="text" id="phoneNo" name="phoneNo" readonly />
+        </div>
+        <div class="form-group">
+          <label for="email">Email:</label>
+          <input type="email" id="email" name="email" required />
+        </div>
+        <div class="form-group">
+          <label for="course">Course:</label>
+          <input type="text" id="course" name="course" required />
+        </div>
+        <div class="form-group">
+          <label for="rollNo">Roll Number:</label>
+          <input type="text" id="rollNo" name="rollNo" required />
+        </div>
+        <div class="form-group">
+          <label for="faceData">Upload New Face Data:</label>
+          <input type="file" id="faceData" name="faceData" />
+        </div>
+        <button type="submit">Save Changes</button>
+      </form>
+    </div>
+
+    <script>
+      const urlParams = new URLSearchParams(window.location.search);
+      const phoneNo = urlParams.get("phoneNo");
+
+      // Fetch student profile details from backend and populate form
+      fetch(`/api/auth/student/${phoneNo}`)
+        .then((response) => response.json())
+        .then((data) => {
+          document.getElementById("name").value = data.name;
+          document.getElementById("age").value = data.age;
+          document.getElementById("phoneNo").value = data.phoneNo;
+          document.getElementById("email").value = data.email;
+          document.getElementById("course").value = data.course;
+          document.getElementById("rollNo").value = data.rollNo;
+        })
+        .catch((error) =>
+          console.error("Error fetching student profile:", error)
+        );
+
+      // Form submission handler
+      document
+        .getElementById("editProfileForm")
+        .addEventListener("submit", function (event) {
+          event.preventDefault();
+
+          const formData = new FormData(this);
+
+          // Update student profile details via API
+          fetch(`/api/auth/updateStudent/${phoneNo}`, {
+            method: "PUT",
+            body: formData,
+          })
+            .then((response) => {
+              if (response.ok) {
+                alert("Profile updated successfully");
+                window.location.href = `/sprofile.html?role=student&phoneNo=${phoneNo}`; // Redirect to profile page
+              } else {
+                throw new Error("Failed to update profile");
+              }
+            })
+            .catch((error) => {
+              console.error("Error updating profile:", error);
+              alert("Failed to update profile. Please try again.");
+            });
+        });
+    </script>
+  </body>
+</html>

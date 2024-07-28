@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>All Assignments</title>
+    <link rel="stylesheet" href="allassignments.css" />
+  </head>
+  <body>
+    <h1>All Assignments</h1>
+    <div id="assignments-container">
+      <div id="assignments-list" class="assignment-list"></div>
+    </div>
+
+    <!-- Password Modal for Entering Assignment -->
+    <div id="password-modal" class="modal">
+      <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>Enter Assignment Password</h2>
+        <input
+          type="password"
+          id="assignment-password"
+          placeholder="Password"
+        />
+        <button id="submit-password">Submit</button>
+        <button id="cancel-password">Cancel</button>
+      </div>
+    </div>
+
+    <script>
+      let assignmentToVerify = null;
+
+      async function loadAssignments() {
+        try {
+          const response = await fetch("/api/activeAssignments");
+          const assignments = await response.json();
+          const assignmentsList = document.getElementById("assignments-list");
+          assignmentsList.innerHTML = "";
+
+          assignments.forEach((assignment) => {
+            const assignmentDiv = document.createElement("div");
+            assignmentDiv.classList.add("assignment-box");
+            const isClosed = assignment.isClosed;
+
+            assignmentDiv.innerHTML = `
+            <div class="assignment">
+              <h3>${assignment.assignmentName}</h3>
+              <p>Course: ${assignment.course}</p>
+              <p>Staff Name: ${assignment.staffName}</p>
+              <p>Deadline: ${new Date(assignment.deadline).toLocaleString()}</p>
+              ${
+                isClosed
+                  ? `<p class="status glowing">Closed</p>`
+                  : `<button class="enter-button" data-assignment-id="${assignment._id}">Enter</button>`
+              }
+            </div>
+          `;
+            assignmentsList.appendChild(assignmentDiv);
+
+            // Attach event listener for enter button
+            if (!isClosed) {
+              assignmentDiv
+                .querySelector(".enter-button")
+                .addEventListener("click", (event) => {
+                  assignmentToVerify = assignment;
+                  document.getElementById("password-modal").style.display =
+                    "block";
+                });
+            }
+          });
+        } catch (error) {
+          console.error("Error loading assignments:", error);
+          alert("Error loading assignments.");
+        }
+      }
+
+      window.addEventListener("load", () => {
+        loadAssignments();
+
+        const closeBtns = document.querySelectorAll(".close");
+        closeBtns.forEach((btn) => {
+          btn.onclick = () => {
+            document.getElementById("password-modal").style.display = "none";
+          };
+        });
+
+        window.onclick = (event) => {
+          if (event.target === document.getElementById("password-modal")) {
+            document.getElementById("password-modal").style.display = "none";
+          }
+        };
+
+        // Submit password for verification
+        document.getElementById("submit-password").onclick = async () => {
+          const password = document
+            .getElementById("assignment-password")
+            .value.trim();
+          const assignmentId = assignmentToVerify._id;
+
+          try {
+            const response = await fetch("/api/verifyAssignmentAccess", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ assignmentId, password }),
+            });
+
+            if (response.ok) {
+              const result = await response.json();
+              if (result.success) {
+                alert("Password verified. Redirecting to submission page...");
+                window.location.href = `/submission.html?assignmentId=${assignmentId}`; // Redirect to submission page
+              } else {
+                alert("Incorrect password.");
+              }
+            } else {
+              alert("Error verifying password.");
+            }
+          } catch (error) {
+            console.error("Error verifying password:", error);
+            alert("Error verifying password.");
+          }
+        };
+
+        document.getElementById("cancel-password").onclick = () => {
+          document.getElementById("password-modal").style.display = "none";
+        };
+      });
+    </script>
+  </body>
+</html>

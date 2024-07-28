@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Submit Assignment</title>
+    <link rel="stylesheet" href="submission.css" />
+  </head>
+  <body>
+    <div class="container">
+      <h1>Submit Assignment</h1>
+      <form id="submission-form">
+        <input type="hidden" id="assignment-id" name="assignmentId" value="" />
+        <div>
+          <label for="student-name">Student Name:</label>
+          <input type="text" id="student-name" name="studentName" required />
+        </div>
+        <div>
+          <label for="roll-no">Roll Number:</label>
+          <input type="text" id="roll-no" name="rollNo" required />
+        </div>
+        <div>
+          <label for="assignment-name">Assignment Name:</label>
+          <input
+            type="text"
+            id="assignment-name"
+            name="assignmentName"
+            required
+          />
+        </div>
+        <div>
+          <label for="drive-link">Drive Link:</label>
+          <input type="text" id="drive-link" name="driveLink" required />
+        </div>
+        <button type="submit">Submit</button>
+      </form>
+
+      <script>
+        window.addEventListener("load", () => {
+          const urlParams = new URLSearchParams(window.location.search);
+          const assignmentId = urlParams.get("assignmentId");
+          document.getElementById("assignment-id").value = assignmentId;
+
+          document.getElementById("submission-form").onsubmit = async (
+            event
+          ) => {
+            event.preventDefault();
+            const formData = new FormData(event.target);
+
+            try {
+              const response = await fetch("/api/assignments/submit", {
+                method: "POST",
+                body: new URLSearchParams(formData),
+              });
+
+              if (response.ok) {
+                const result = await response.json();
+                alert(
+                  result.success ? "Submission successful!" : result.message
+                );
+              } else {
+                alert("Error submitting assignment.");
+              }
+            } catch (error) {
+              console.error("Error submitting assignment:", error);
+              alert("Error submitting assignment.");
+            }
+          };
+        });
+      </script>
+    </div>
+  </body>
+</html>

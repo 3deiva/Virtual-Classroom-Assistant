@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Attendance</title>
+
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        background-color: #f0f0f0;
+      }
+
+      .main-container {
+        display: flex;
+        min-height: 100vh;
+      }
+
+      .sidebar {
+        background-color: #007bff;
+        color: #fff;
+        padding: 20px;
+        width: 250px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        border-top-right-radius: 20px;
+        border-bottom-right-radius: 20px;
+        box-shadow: 5px 0 15px rgba(0, 0, 0, 0.1);
+      }
+
+      .sidebar-header {
+        margin-bottom: 20px;
+      }
+
+      .sidebar h2 {
+        margin: 0;
+        font-size: 24px;
+        text-align: center;
+      }
+
+      .content {
+        flex: 1;
+        padding: 40px;
+        background-color: #fff;
+        border-top-left-radius: 20px;
+        border-bottom-left-radius: 20px;
+        box-shadow: -5px 0 15px rgba(0, 0, 0, 0.1);
+      }
+
+      .top-bar {
+        background-color: #333333;
+        color: #fff;
+        padding: 10px 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-top-left-radius: 20px;
+      }
+
+      .user-info {
+        font-size: 16px;
+      }
+
+      h1 {
+        color: #007bff;
+        font-size: 32px;
+        margin: 0 0 20px;
+      }
+
+      p {
+        color: #333333;
+        font-size: 16px;
+        margin: 0 0 20px;
+      }
+
+      button {
+        background-color: #007bff;
+        color: #fff;
+        border: none;
+        padding: 10px 20px;
+        font-size: 16px;
+        cursor: pointer;
+        border-radius: 4px;
+        transition: background-color 0.3s;
+      }
+
+      button:hover {
+        background-color: #0056b3;
+      }
+
+      .iframe-container {
+        position: relative;
+        width: 100%;
+        height: 600px; /* Adjust height as needed */
+        margin-top: 20px;
+        background-color: #f0f0f0;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        overflow: hidden;
+      }
+
+      .iframe-container iframe {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        border: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="main-container">
+      <!-- Sidebar -->
+      <aside class="sidebar">
+        <div class="sidebar-header">
+          <h2>Attendance</h2>
+        </div>
+      </aside>
+
+      <!-- Main Content -->
+      <div class="content">
+        <header class="top-bar">
+          <div class="user-info">
+            <span id="welcomeMessage">Welcome, Student</span>
+          </div>
+        </header>
+
+        <main>
+          <h1>Manage Attendance</h1>
+          <p>
+            Here you can give attendance. Here it uses face attendance tracking
+            mechanism.
+          </p>
+          <button onclick="toggleIframe()">Attendance Tracking</button>
+          <div
+            class="iframe-container"
+            id="iframeContainer"
+            style="display: none"
+          >
+            <iframe src="http://localhost:8501" frameborder="0"></iframe>
+          </div>
+          <!-- Additional content for classrooms goes here -->
+        </main>
+      </div>
+    </div>
+
+    <script>
+      function toggleIframe() {
+        var iframeContainer = document.getElementById("iframeContainer");
+        if (iframeContainer.style.display === "none") {
+          iframeContainer.style.display = "block";
+        } else {
+          iframeContainer.style.display = "none";
+        }
+      }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,165 @@
+/* General Styles */
+body {
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(135deg, #f0f0f0, #c3cfe2);
+  color: #333;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  box-sizing: border-box;
+  background-attachment: fixed;
+  background-size: cover;
+}
+
+/* Header Styles */
+h1 {
+  margin-bottom: 40px;
+  font-size: 3em;
+  color: #007bff; /* Primary Color */
+  text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.3);
+  font-weight: bold;
+  animation: textGlow 1.5s infinite alternate;
+}
+
+/* Assignment Creation Section */
+#create-assignment {
+  background: rgba(255, 255, 255, 0.9);
+  padding: 30px;
+  border-radius: 15px;
+  box-shadow: 0 15px 25px rgba(0, 0, 0, 0.1);
+  width: 90%;
+  max-width: 500px;
+  -webkit-backdrop-filter: blur(10px); /* For Safari support */
+  backdrop-filter: blur(10px);
+  animation: fadeIn 1s ease-in-out;
+  text-align: center;
+}
+
+#create-assignment h2 {
+  margin-bottom: 20px;
+  font-size: 2em;
+  color: #007bff; /* Primary Color */
+}
+
+/* Form Styles */
+form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+form input[type="text"],
+form input[type="password"],
+form input[type="datetime-local"] {
+  width: calc(100% - 20px);
+  padding: 10px;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  box-sizing: border-box;
+  margin-bottom: 15px;
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+form input[type="text"]:focus,
+form input[type="password"]:focus,
+form input[type="datetime-local"]:focus {
+  border-color: #007bff; /* Primary Color */
+  box-shadow: 0 0 10px rgba(0, 123, 255, 0.2);
+  outline: none;
+}
+
+/* Buttons */
+button {
+  background: linear-gradient(135deg, #007bff, #0056b3);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 20px;
+  font-size: 1em;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.3s, box-shadow 0.3s;
+}
+
+button:hover {
+  background: linear-gradient(135deg, #0056b3, #004494);
+  transform: scale(1.05);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+#view-assignments {
+  margin-top: 20px;
+  background: linear-gradient(135deg, #28a745, #218838);
+}
+
+#view-assignments:hover {
+  background: linear-gradient(135deg, #218838, #1e7e34);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  #create-assignment {
+    width: 95%;
+  }
+}
+
+/* Animations */
+@keyframes textGlow {
+  from {
+    text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.3);
+  }
+  to {
+    text-shadow: 3px 3px 12px rgba(0, 123, 255, 0.6);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Background Animation */
+@keyframes backgroundAnimation {
+  0% {
+    background-position: 0% 0%;
+  }
+  100% {
+    background-position: 100% 100%;
+  }
+}
+
+body::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #f0f0f0, #c3cfe2);
+  background-size: 400% 400%;
+  z-index: -1;
+  animation: backgroundAnimation 15s ease infinite;
+}
+
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, #007bff, #0056b3);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, #0056b3, #004494);
+}

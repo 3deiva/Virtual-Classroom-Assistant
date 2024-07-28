@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Assignment Status</title>
+    <link rel="stylesheet" href="styles.css" />
+    <script src="js/assignmentStatus.js" defer></script>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Assignment Status</h1>
+      <form id="studentForm">
+        <label for="studentName">Student Name:</label>
+        <input type="text" id="studentName" name="studentName" required />
+        <label for="rollNo">Roll No:</label>
+        <input type="text" id="rollNo" name="rollNo" required />
+        <button type="submit">Get Status</button>
+      </form>
+      <div id="assignmentStatus"></div>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Manage Assignments</title>
+    <link rel="stylesheet" href="assignments.css" />
+  </head>
+  <body>
+    <h1>Manage Assignments</h1>
+
+    <!-- Form for Creating New Assignment -->
+    <div id="create-assignment">
+      <h2>Create New Assignment</h2>
+      <form id="assignment-form">
+        <input
+          type="text"
+          id="assignment-name"
+          placeholder="Assignment Name"
+          required
+        />
+        <input type="text" id="course" placeholder="Course" required />
+        <input type="text" id="staff-name" placeholder="Staff Name" required />
+        <input type="datetime-local" id="deadline" required />
+        <input
+          type="password"
+          id="assignment-password"
+          placeholder="Assignment Password"
+          required
+        />
+        <button type="submit">Create Assignment</button>
+      </form>
+      <button id="view-assignments">View All Assignments</button>
+    </div>
+
+    <script>
+      window.addEventListener("load", () => {
+        // Handle assignment form submission
+        const form = document.getElementById("assignment-form");
+        form.onsubmit = async (event) => {
+          event.preventDefault();
+
+          const assignmentName =
+            document.getElementById("assignment-name").value;
+          const course = document.getElementById("course").value;
+          const staffName = document.getElementById("staff-name").value;
+          const deadline = document.getElementById("deadline").value;
+          const password = document.getElementById("assignment-password").value;
+
+          try {
+            const response = await fetch("/api/assignments", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                assignmentName,
+                course,
+                staffName,
+                deadline,
+                password,
+              }),
+            });
+
+            if (response.ok) {
+              alert("Assignment created successfully.");
+              form.reset();
+            } else {
+              alert("Error creating assignment.");
+            }
+          } catch (error) {
+            console.error("Error creating assignment:", error);
+            alert("Error creating assignment.");
+          }
+        };
+
+        // Navigate to all assignments page
+        const viewAssignmentsBtn = document.getElementById("view-assignments");
+        viewAssignmentsBtn.onclick = () => {
+          window.location.href = "allassignments.html";
+        };
+      });
+    </script>
+  </body>
+</html>
